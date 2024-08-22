@@ -64,7 +64,7 @@ const getAllVendors = async (req, res) => {
 };
 
 const getVendorById = async (req, res) => {
-  const vendorId = req.params.id;  // Assuming "id" is the correct parameter name
+  const vendorId = req.params.id;  
 
   try {
     const vendor = await Vendor.findById(vendorId);
