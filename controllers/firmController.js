@@ -20,7 +20,7 @@ const upload = multer({ storage: storage });
 const addFirm = async (req, res) => {
     try {
         const { firmName, area, category, region, offer } = req.body;
-        const file = req.file ? req.file.filename : undefined;
+        const image = req.file ? req.file.filename : undefined;
 
         // Find the vendor by ID
         const vendor = await Vendor.findById(req.vendorId);

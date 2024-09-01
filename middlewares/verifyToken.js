@@ -4,7 +4,7 @@ const dotEnv = require('dotenv');
 
 dotEnv.config();
 
-const secretKey = process.env.MyNameIsValli;
+const secretKey = process.env.WhatIsYourName;
 
 const verifyToken = async (req, res, next) => {
     const token = req.headers.token || req.headers.authorization?.split(' ')[1]; // Handles Bearer token
