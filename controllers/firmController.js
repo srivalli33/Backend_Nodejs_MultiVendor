@@ -1,34 +1,35 @@
 const Firm = require('../models/Firm');
 const Vendor = require('../models/Vendor');
 const multer = require('multer');
-const Path = require('path');
+const path = require('path');
 
-// Configure Multer storage
+
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
+    destination: function(req, file, cb) {
+        cb(null, 'uploads/'); // Destination folder where the uploaded images will be stored
     },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + Path.extname(file.originalname));
+    filename: function(req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname)); // Generating a unique filename
     }
 });
 
-// Initialize Multer with the configured storage
 const upload = multer({ storage: storage });
 
-// Controller function to add a firm
-const addFirm = async (req, res) => {
+const addFirm = async(req, res) => {
     try {
         const { firmName, area, category, region, offer } = req.body;
+
         const image = req.file ? req.file.filename : undefined;
 
-        // Find the vendor by ID
         const vendor = await Vendor.findById(req.vendorId);
         if (!vendor) {
-            return res.status(404).json({ message: "Vendor not found" });
+            res.status(404).json({ message: "Vendor not found" })
         }
 
-        // Create a new firm instance
+        if (vendor.firm.length > 0) {
+            return res.status(400).json({ message: "vendor can have only one firm" });
+        }
+
         const firm = new Firm({
             firmName,
             area,
@@ -37,41 +38,41 @@ const addFirm = async (req, res) => {
             offer,
             image,
             vendor: vendor._id
-        });
+        })
 
-        // Save the firm to the database
         const savedFirm = await firm.save();
 
-        // Associate the firm with the vendor
-        vendor.firm.push(savedFirm);
-        await vendor.save();
+        const firmId = savedFirm._id
+        const vendorFirmName = savedFirm.firmName
 
-        // Respond with success message
-        return res.status(200).json({ message: 'Firm added successfully' });
+        vendor.firm.push(savedFirm)
+
+        await vendor.save()
+
+
+
+        return res.status(200).json({ message: 'Firm Added successfully ', firmId, vendorFirmName });
+
+
     } catch (error) {
-        console.error('Error adding firm:', error); // Improved logging
-        return res.status(500).json({ message: "Internal server error", error: error.message });
+        console.error(error)
+        res.status(500).json("intenal server error")
     }
-};
+}
 
-// Controller function to delete a firm by its ID
-const deleteFirmById = async (req, res) => {
+const deleteFirmById = async(req, res) => {
     try {
         const firmId = req.params.firmId;
 
-        // Find and delete the firm by its ID
-        const deletedFirm = await Firm.findByIdAndDelete(firmId);
+        const deletedProduct = await Firm.findByIdAndDelete(firmId);
 
-        if (!deletedFirm) {
-            return res.status(404).json({ error: "Firm not found" });
+        if (!deletedProduct) {
+            return res.status(404).json({ error: "No product found" })
         }
-
-        return res.status(200).json({ message: 'Firm deleted successfully' });
     } catch (error) {
-        console.error("Error deleting firm:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" })
     }
-};
+}
 
-// Export the functions, with `addFirm` using Multer's middleware to handle file uploads
-module.exports = { addFirm: [upload.single('image'), addFirm], deleteFirmById };
+module.exports = { addFirm: [upload.single('image'), addFirm], deleteFirmById }

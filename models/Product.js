@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
-    productName:{
+    productName: {
         type: String,
         required: true
     },
@@ -11,22 +11,22 @@ const productSchema = new mongoose.Schema({
     },
     category: {
         type: [{
-             type: String,
-             enum: ['veg', 'non-veg']
+            type: String,
+            enum: ['veg', 'non-veg']
         }]
     },
-    image:{
+    image: {
         type: String
     },
-    bestSeller:{
-        type: String
+    bestSeller: {
+        type: Boolean
     },
-    description:{
+    description: {
         type: String
     },
     firm: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref:'Firm'
+        ref: 'Firm'
     }]
 });
 
